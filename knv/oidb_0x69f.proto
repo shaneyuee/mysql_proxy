@@ -1,0 +1,86 @@
+//oidb命令字0x69f
+//拉取频道列表
+package tencent.im.oidb.cmd0x69f;
+
+message ReqBody
+{
+	optional uint64 uint64_uin = 1;          //Uin
+	optional uint32 uint32_req_all_channel_list = 11; //是否请求全部频道列表，0-不请求，1-请求，缺省值0
+	optional uint32 uint32_req_my_channel_id_list = 12; //是否请求我关注的频道ID列表
+	optional uint32 uint32_req_local_channel_id = 13;	//是否请求本地频道(注: 本地频道需要计算, 如果不存在, 一段时间后拉取的话会继续计算, 但是中间的时间会返回没有该频道)
+	optional uint32 uint32_req_bigpic_channel = 14; // 是否请求大图频道
+	optional uint32 uint32_req_video_channel = 15; // 是否请求视频频道
+	optional uint32 uint32_req_gif_channel = 16; // 是否请求gif频道
+	optional uint32 uint32_req_search_channel = 17; // 是否请求search频道
+	optional uint32 uint32_req_recomm_channel = 18;	//是否拉取6.5.3推荐频道信息，0-不拉取，1-拉取
+	optional uint32 uint32_important = 19;	//本次拉6.5.3推荐频道是否重要，不重要的后台可能在过载情况下丢包不处理，0-不重要，1-重要
+	optional uint32 uint32_req_search_word = 20;	//是否请求搜索栏配置的文字信息
+	optional uint32 uint32_req_channel_jump_url = 21;	//是否请求频道跳转url
+	optional uint32 uint32_req_channel_id = 22; //需要拉取的一级频道ID 0为看点 56视频
+	optional uint32 uint32_req_channel_cover = 23;   //是否拉取二级频道封面信息
+	optional uint32 uint32_req_channel_seq = 24;  //首次填0，后续请求使用后台返回的
+	optional uint64 uint64_req_ctrl_bits = 25;    //拉取控制位集合 0x1置位表示拉取话题 0x2置位拉取活动 0x4 720主feeds独立版本下发56频道
+}
+
+message ChildChannelInfo
+{
+	optional uint32 uint32_channel_id = 1; // 频道ID
+}
+
+enum ChannelCoverStyle
+{
+    CoverStyle_Wording=0;
+    CoverStyle_ArticleTitle=1;
+}
+
+enum ColumnType
+{
+    ColumnType_Channel = 0;  // 频道
+    ColumnType_Topic = 1;    // 话题
+    ColumnType_Activity = 2; // 活动
+}
+
+message RichTips
+{
+    optional uint32 uint32_tips_type = 1;  // 类型 1普通红点 2角标
+    optional bytes  bytes_tips_text = 2;   // 角标文字
+    optional uint32 uint32_latest_sticky_time = 3;   // 最近置顶时间，如果为0表示没有置顶，如果当前有置顶，则为CMS置顶操作时间
+}
+
+message ChannelInfo
+{
+	optional uint32 uint32_channel_id = 1; // 频道ID，话题ID
+	optional bytes bytes_channel_name = 2; // 频道名称，话题名称
+	//optional uint32 uint32_is_local_channel = 3;	//是否本地频道
+	optional uint32 uint32_channel_type = 3;	//频道类型：0-普通频道，1-本地频道，2-大图频道，3-视频频道，4-gif频道，
+	optional uint32 uint32_is_first_req = 4;	//是否是首次拉取的本地频道
+	repeated ChildChannelInfo rpt_child_channel_list = 5;	//子频道列表
+	optional uint32 uint32_frame_color = 6;	//频道线框颜色，ARGB值，0表示使用默认颜色
+	optional uint32 uint32_fonts_color = 7;	//频道字体颜色，ARGB值，0表示使用默认颜色
+	optional bytes bytes_channel_jump_url = 8; // 频道跳转链接
+	optional uint32 uint32_bold_font = 9; //频道是否字体加粗, 0:否，1：是
+	optional uint32 uint32_show_icon = 10; //频道是否展示icon,0:否，1：是
+	optional bytes bytes_ark_config = 11; //ark配置内容	
+	optional ChannelCoverStyle enum_channel_cover_style = 12; //二级频道封面样式 
+	optional bytes bytes_channel_cover_wording = 13;       //二级频道封面文章标题，话题简介
+	optional bytes bytes_channel_cover_picurl = 14;        //二级频道封面文单图片url，话题图片
+	optional uint64 uint64_channel_cover_article_id = 15;  //二级频道封面文章ID
+	optional bytes bytes_channel_cover_spec= 16;           //二级频道展示控制json串 类似 {mask_color : FFEEFF}
+	optional uint32 uint32_is_followed=17;                 //是否关注的，0不是用户关注的，由系统推荐 1是用户关注的，可以取关
+	optional ColumnType enum_column_type = 18;             //栏目类型
+	optional RichTips msg_rich_tips = 19;                  //更新提醒	
+	optional bytes bytes_icon_url = 20;                    // icon图标url
+}
+
+
+message RspBody
+{
+	optional uint64 uint64_uin = 1;          //Uin
+	repeated ChannelInfo rpt_channel_list = 11; // 全部频道列表
+	repeated uint32 rpt_uint32_my_channel_id_list = 12; // 我关注的频道ID列表
+	repeated ChannelInfo rpt_recomm_channel_list = 13; // 6.5.3推荐频道列表
+	repeated bytes bytes_search_word = 14;	//搜索栏配置的文字信息
+	optional uint32 uint32_req_channel_id = 22; //原样返回请求中值
+	optional uint32 uint32_channel_seq = 24;    //保存在本地，下次请求原样带回
+}
+
